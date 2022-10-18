@@ -1,6 +1,7 @@
-package app
+package crawler
 
 import (
+	"crawler/internal/cache"
 	"crawler/internal/client"
 	"errors"
 	"net/http"
@@ -26,7 +27,7 @@ func TestSiteCrawler_Crawl(t *testing.T) {
 			domains: []string{"client://aa.com"},
 			responses: client.ResponseMap{
 				"client://aa.com": func() (resp *http.Response, err error) {
-					return &http.Response{StatusCode: 200}, nil
+					return &http.Response{StatusCode: http.StatusOK}, nil
 				},
 			},
 			want: map[string]string{
@@ -38,13 +39,13 @@ func TestSiteCrawler_Crawl(t *testing.T) {
 			domains: []string{"client://gg.com", "muu.com", "client://mn.com"},
 			responses: client.ResponseMap{
 				"client://gg.com": func() (resp *http.Response, err error) {
-					return &http.Response{StatusCode: 200}, nil
+					return &http.Response{StatusCode: http.StatusOK}, nil
 				},
 				"muu.com": func() (resp *http.Response, err error) {
 					return nil, errors.New("imitate client error")
 				},
 				"client://mn.com": func() (resp *http.Response, err error) {
-					return &http.Response{StatusCode: 401}, nil
+					return &http.Response{StatusCode: http.StatusUnauthorized}, nil
 				},
 			},
 			want: map[string]string{
@@ -57,9 +58,11 @@ func TestSiteCrawler_Crawl(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &client.MockClient{Responses: tt.responses}
+			mock := &client.MockClient{Responses: tt.responses}
+			empty := make(map[string]string)
+			crawler := NewCrawler(mock, cache.New(empty))
 
-			got, err := Crawl(c, tt.domains)
+			got, err := crawler.Crawl(tt.domains)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Crawl() error = %v, wantErr %v", err, tt.wantErr)
 				return

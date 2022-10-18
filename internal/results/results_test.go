@@ -1,4 +1,4 @@
-package app
+package results
 
 import (
 	"reflect"
@@ -9,7 +9,6 @@ func TestNewResultsMap(t *testing.T) {
 	tests := []struct {
 		name    string
 		domains []string
-		//want    ResultsMap
 		want    map[string]string
 		wantErr bool
 	}{
@@ -48,13 +47,13 @@ func TestNewResultsMap(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewResultsMap(tt.domains)
+			got, err := NewResults(tt.domains)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("NewResultsMap() error = %v, \nwantErr %v", err, tt.wantErr)
+				t.Errorf("NewResults() error = %v, \nwantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewResultsMap() got = %v, \nwant %v", got, tt.want)
+				t.Errorf("NewResults() got = %v, \nwant %v", got, tt.want)
 			}
 		})
 	}

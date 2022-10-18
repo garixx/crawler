@@ -1,27 +1,26 @@
 package handlers
 
 import (
-	"crawler/internal/app"
-	"crawler/internal/client"
+	"crawler/internal/crawler"
 	"encoding/json"
 	"net/http"
 )
 
-type urlsToParse struct {
+type task struct {
 	Urls []string `json:"urls"`
 }
 
-func ParseHandler(client client.HTTPClient) func(w http.ResponseWriter, r *http.Request) {
+func ParseHandler(a crawler.Crawler) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var urls urlsToParse
+		var task task
 
-		err := json.NewDecoder(r.Body).Decode(&urls)
+		err := json.NewDecoder(r.Body).Decode(&task)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		got, err := app.Crawl(client, urls.Urls)
+		got, err := a.Crawl(task.Urls)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return

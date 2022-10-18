@@ -1,4 +1,4 @@
-package app
+package results
 
 import (
 	"errors"
@@ -7,10 +7,10 @@ import (
 
 type Results struct {
 	mu      sync.Mutex
-	results map[string]string
+	Results map[string]string
 }
 
-func NewResultsMap(domains []string) (map[string]string, error) {
+func NewResults(domains []string) (map[string]string, error) {
 	if len(domains) < 1 {
 		return nil, errors.New("empty URLs list provided")
 	}
@@ -19,4 +19,10 @@ func NewResultsMap(domains []string) (map[string]string, error) {
 		results[v] = "Not Processed"
 	}
 	return results, nil
+}
+
+func (r *Results) Put(uri, result string) {
+	r.mu.Lock()
+	r.Results[uri] = result
+	r.mu.Unlock()
 }
