@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"crawler/internal/crawler"
+	"crawler/internal/results"
 	"encoding/json"
 	"net/http"
 )
@@ -26,7 +27,13 @@ func ParseHandler(a crawler.Crawler) func(w http.ResponseWriter, r *http.Request
 			return
 		}
 
-		output, err := json.Marshal(got)
+		res := make([]results.Result, 0, len(got))
+
+		for _, value := range got {
+			res = append(res, value)
+		}
+
+		output, err := json.Marshal(res)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

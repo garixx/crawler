@@ -4,6 +4,7 @@ import (
 	"crawler/internal/cache"
 	"crawler/internal/crawler"
 	"crawler/internal/handlers"
+	"crawler/internal/results"
 	"flag"
 	"github.com/gorilla/mux"
 	"log"
@@ -21,7 +22,7 @@ func main() {
 	flag.Parse()
 
 	client := &http.Client{Timeout: 10 * time.Second}
-	empty := make(map[string]string)
+	empty := make(map[string]results.Result)
 	c := crawler.NewCrawler(client, cache.New(empty))
 
 	r := mux.NewRouter()
